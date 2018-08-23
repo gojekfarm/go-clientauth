@@ -1,7 +1,7 @@
 .PHONY: all
 all: build-deps build fmt vet lint test
 
-GLIDE_NOVENDOR=$(shell glide novendor)
+GO_LIST=$(shell go list)
 
 setup:
 	mkdir -p $(GOPATH)/bin
@@ -10,22 +10,22 @@ setup:
 	go build -tags 'postgres' -o /usr/local/bin/migrate github.com/mattes/migrate/cli
 
 build-deps:
-	glide install
+	dep ensure
 
 update-deps:
-	glide update
+	dep ensure --update
 
 compile:
 	mkdir -p out/
-	go build -race $(GLIDE_NOVENDOR)
+	go build -race $(GO_LIST)
 
 build: build-deps compile fmt vet lint
 
 fmt:
-	go fmt $(GLIDE_NOVENDOR)
+	go fmt $(GO_LIST)
 
 vet:
-	go vet $(GLIDE_NOVENDOR)
+	go vet $(GO_LIST)
 
 lint:
 	@for p in $(UNIT_TEST_PACKAGES); do \
@@ -43,4 +43,4 @@ db.migrate: db.drop db.create
 	migrate -database "postgres://localhost:5432/client_auth?sslmode=disable" -path ./migrations up
 
 test: db.migrate
-	ENVIRONMENT=test go test -race $(GLIDE_NOVENDOR)
+	ENVIRONMENT=test go test -v -race $(GO_LIST)

@@ -1,6 +1,12 @@
-# Client Authorization
+# Go Client Auth
 
-## Middleware usage
+```
+go get github.com/gojektech/go-clientauth
+``` 
+
+## Usage
+
+### Middleware
 
 #### func  WithClientIDAndPassKeyAuthorization
 
